@@ -7,13 +7,14 @@ __author__ = 'Nico'
 
 import re
 import textwrap
-from datetime import datetime
+from datetime import datetime,date
 import json
 
 class Entry:
     def __init__(self, date=None,title="", body="", starred=False):
         #self.journal = journal  # Reference to journal mainly to access it's config
-        self.date = date or datetime.now()
+        #self.date = date or datetime.now()
+        self.date = date or date.today()
         self.title = title.rstrip("\n ")
         self.body = body.rstrip("\n ")
         #self.tags = self.parse_tags()
@@ -34,20 +35,20 @@ class Entry:
         self.tags = tags
         return set(tags)
 
-    def __unicode__(self):
-        """Returns a string representation of the entry to be written into a journal file."""
-        #date_str = self.date.strftime(self.journal.config['timeformat'])
-        print("title: " + self.title)
-        print("body: " + self.body)
-        date_str = datetime.now().strftime("%A %d %b %Y, %H:%M")
-        title = date_str + " " + self.title.rstrip("\n ")
-        if self.starred:
-            title += " *"
-        return "{title}{sep}{body}\n".format(
-            title=title,
-            sep="\n" if self.body.rstrip("\n ") else "",
-            body=self.body.rstrip("\n ")
-        )
+    # def __unicode__(self):
+    #     """Returns a string representation of the entry to be written into a journal file."""
+    #     #date_str = self.date.strftime(self.journal.config['timeformat'])
+    #     print("title: " + self.title)
+    #     print("body: " + self.body)
+    #     date_str = datetime.now().strftime("%A %d %b %Y, %H:%M")
+    #     title = date_str + " " + self.title.rstrip("\n ")
+    #     if self.starred:
+    #         title += " *"
+    #     return "{title}{sep}{body}\n".format(
+    #         title=title,
+    #         sep="\n" if self.body.rstrip("\n ") else "",
+    #         body=self.body.rstrip("\n ")
+    #     )
 
     # def pprint(self, short=False):
     #     """Returns a pretty-printed version of the entry.
