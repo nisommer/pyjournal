@@ -184,12 +184,21 @@ last_touch = datetime.now()
 
 
 # Get dropbox's location
-dropbox_config_file = open(os.getenv('APPDATA') + "\Dropbox\info.json")
+#For windows # replace this with checking the filesystem ..
+try:
+    dropbox_config_file = open(os.getenv('APPDATA') + "\Dropbox\info.json")
+except:
+    dropbox_config_file = open("/Users/nicolassommer/.dropbox/info.json")
+
+# For mac
+
+
+
 test = dropbox_config_file.read()
 data = json.loads(test)
 dropbox_path = data["personal"]["path"]
 print("dropbox_path: " + dropbox_path)
-journal_file = dropbox_path+'.journal.txt'
+journal_file = dropbox_path+'/.journal.txt'
 
 
 # Load data
