@@ -185,7 +185,7 @@ mainframe = ttk.Frame(root)
 mainframe.pack(fill=BOTH,expand=1)
 
 ## Create Main Frame
-text = Text(mainframe,background = "light yellow")
+text = Text(mainframe,background = "light yellow",wrap="word")
 
 bottomframe = ttk.Frame(root)
 quitButton = Button(bottomframe, text="QUIT", command=root.destroy)
@@ -246,42 +246,31 @@ currentdate= date.today()
 
 nowH = datetime.today()
 #.set(nowH.strftime("%A %d %b %Y, %H:%M"))
-#dateDisplayText.set(currentdate.strftime("%A %d %b %Y") + " - " +  nowH.strftime("%H:%M"))
 dateDisplayText.set(currentdate.strftime("%A %d %b %Y"))
 
-
 # Get dropbox's location
-#For windows # replace this with checking the filesystem ..
-
-print(sys.platform)
 if(sys.platform.startswith("linux")):
-    print(1)
+    dropbox_config_path = expanduser("~") + "/.dropbox/info.json"
 elif(sys.platform.startswith("darwin")):
-    print(1)
+    dropbox_config_path = expanduser("~") + "/.dropbox/info.json"
+elif(sys.platform.startswith("win")):
+    dropbox_config_path = os.getenv('APPDATA') + "\Dropbox\info.json"
 else:
-    print(1)
+    print("Failed to get Dropbox's config file path")
 
 
 try:
     dropbox_config_file = open(expanduser("~") + "/.dropbox/info.json")
 except:
-    dropbox_config_file = open("/Users/nicolassommer/.dropbox/info.json")
-
-    try:
-        dropbox_config_file = open(os.getenv('APPDATA') + "\Dropbox\info.json")
-    except:
-        print("DropBox Config not found ...")
+    print("failed opening Dropbox's config file")
 
 
-
-
-
-test = dropbox_config_file.read()
-data = json.loads(test)
-dropbox_path = data["personal"]["path"]
-print("dropbox_path: " + dropbox_path)
-journal_file = dropbox_path+'/.journal.txt'
-journal_file_entries = dropbox_path+'/.entries.txt'
+dropbox_config_content = dropbox_config_file.read()
+dropbox_config_json = json.loads(dropbox_config_content)
+dropbox_folder_path = dropbox_config_json["personal"]["path"]
+print("dropbox_path: " + dropbox_folder_path)
+journal_file = dropbox_folder_path+'/.journal.txt'
+journal_file_entries = dropbox_folder_path+'/.entries.txt'
 
 # # Load 1 entry
 # try:
