@@ -7,13 +7,15 @@ from tkinter import ttk
 from datetime import datetime
 from datetime import date, timedelta
 from tkinter import messagebox
-
+import sys
 
 import Entry
 import methods
 import json
 import jsonpickle
 import os
+from os.path import expanduser
+
 
 #import time
 from collections import Counter # To count each word ...
@@ -36,9 +38,9 @@ def retrieve_input():
     return text.get("1.0", "end-1c")
 
 def on_closing():
-    if messagebox.askokcancel("Quit", "Do you want to quit?"):
+    if messagebox.askyesno("Save", "Do you want to save?"):
         return_touched()
-        root.destroy()
+    root.destroy()
 
 def key_touched(*args):
 
@@ -77,6 +79,14 @@ def key_touched(*args):
 
     wordList.sort(reverse=1)
     cnames.set(tuple(wordList))
+
+
+    # Try to print out the current line ..
+    # print(text.get("insert linestart","insert lineend")=="")
+    # if(text.get("insert linestart","insert lineend").strip()==""):
+    #     print("empty line")
+    # else:
+    #     print("There is something on the line")
 
 def return_touched(*args):
 
@@ -144,6 +154,22 @@ def dateload(date):
     dateDisplayText.set(currentdate.strftime("%A %d %b %Y"))
 
 
+def insertTime():
+
+    stringtemp = "\n--- TIME: " + datetime.today().strftime("%H:%M")  +"---"
+
+    if(text.get("insert linestart","insert lineend").strip()==""):
+        print("empty line")
+    else:
+        print("There is something on the line")
+        stringtemp+="\n"
+
+    text.insert("insert linestart", stringtemp)
+
+
+
+
+
 
 
 
@@ -164,6 +190,8 @@ text = Text(mainframe,background = "light yellow")
 bottomframe = ttk.Frame(root)
 quitButton = Button(bottomframe, text="QUIT", command=root.destroy)
 infoButton = Button(bottomframe, text="Info", command=display_info)
+TagButton = Button(bottomframe, text="Tag time", command=insertTime)
+
 
 
 wordCount = IntVar() # Number of words
@@ -182,6 +210,7 @@ homebutton = Button(topframe,text="HOME", command=lambda: dateset("home"))
 rightbutton.pack(side=RIGHT)
 homebutton.pack(side=RIGHT)
 leftbutton.pack(side=RIGHT)
+TagButton.pack(side=RIGHT)
 
 progressbar = ttk.Progressbar(mainframe, orient=HORIZONTAL, length=200, mode='determinate', maximum = 750, variable=wordCount)
 
@@ -223,10 +252,26 @@ dateDisplayText.set(currentdate.strftime("%A %d %b %Y"))
 
 # Get dropbox's location
 #For windows # replace this with checking the filesystem ..
+
+print(sys.platform)
+if(sys.platform.startswith("linux")):
+    print(1)
+elif(sys.platform.startswith("darwin")):
+    print(1)
+else:
+    print(1)
+
+
 try:
-    dropbox_config_file = open(os.getenv('APPDATA') + "\Dropbox\info.json")
+    dropbox_config_file = open(expanduser("~") + "/.dropbox/info.json")
 except:
     dropbox_config_file = open("/Users/nicolassommer/.dropbox/info.json")
+
+    try:
+        dropbox_config_file = open(os.getenv('APPDATA') + "\Dropbox\info.json")
+    except:
+        print("DropBox Config not found ...")
+
 
 
 
