@@ -20,8 +20,8 @@ class Entry:
         #self.tags = self.parse_tags()
         self.starred = starred
         self.modified = False
-        print(" init title: " + title)
-        print(" init body: " + body)
+        # print(" init title: " + title)
+        # print(" init body: " + body)
 
     @staticmethod
     def tag_regex(tagsymbols):

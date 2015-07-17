@@ -23,8 +23,8 @@ def new_entry(raw, date=None, sort=True):
             title = ""
             body=raw
 
-        print("title: " + title)
-        print("body: " + body)
+        # print("title: " + title)
+        # print("body: " + body)
 
 
         ## Title parsing is not good : do it manually : take the first line ! or just dont take titles ...

@@ -1,5 +1,5 @@
-
-#from __future__ import absolute_import
+#!/usr/bin/python3.4
+# #from __future__ import absolute_import
 #from __future__ import absolute_import, unicode_literals
 #from . import Entry
 from tkinter import *
@@ -156,7 +156,7 @@ def dateload(date):
 
 def insertTime():
 
-    stringtemp = "\n--- TIME: " + datetime.today().strftime("%H:%M")  +"---"
+    stringtemp = "--- TIME: " + datetime.today().strftime("%H:%M")  +"---"
 
     if(text.get("insert linestart","insert lineend").strip()==""):
         print("empty line")
@@ -165,6 +165,9 @@ def insertTime():
         stringtemp+="\n"
 
     text.insert("insert linestart", stringtemp)
+
+#     En fait, il faudrait que si la ligne suivante est vide, le curseur passe a la ligne suivante, mais pas forcement
+# ajouter une nouvelle ligne --> Trouver commande pour passer le curseur a la fin de la ligne suivante ...
 
 
 
@@ -178,6 +181,7 @@ def insertTime():
 root = Tk()
 root.title("Journal test program")
 
+
 initTime=datetime.now()
 
 # Previous version ...
@@ -188,7 +192,7 @@ mainframe.pack(fill=BOTH,expand=1)
 text = Text(mainframe,background = "light yellow",wrap="word")
 
 bottomframe = ttk.Frame(root)
-quitButton = Button(bottomframe, text="QUIT", command=root.destroy)
+quitButton = Button(bottomframe, text="QUIT", command=on_closing)
 infoButton = Button(bottomframe, text="Info", command=display_info)
 TagButton = Button(bottomframe, text="Tag time", command=insertTime)
 
@@ -224,7 +228,7 @@ dateDisplay.pack(side=TOP,fill=BOTH)
 
 topframe.pack(side=TOP,fill=BOTH)
 
-text.pack(side=TOP,fill=BOTH)
+text.pack(side=TOP,fill=BOTH, expand = 1)
 bottomframe.pack(side=BOTTOM)
 words.pack(side=RIGHT)
 lastTimeDisplay.pack(side=LEFT)
@@ -294,6 +298,11 @@ except:
     my_entries = dict()
 
 
+# Change Theme
+s =ttk.Style()
+print(s.theme_names())
+print(s.theme_use())
+s.theme_use("clam") # Not sure that works on windows !
 
 # Init the functions
 key_touched()
@@ -302,6 +311,18 @@ key_touched()
 root.bind('<KeyPress>', key_touched)
 root.bind('<Return>', return_touched)
 
+# Window on Top (check if that works on mac ...) it means ALWAYS on top !!!
+#root.attributes('-topmost', True)
+
 # Run the program
 root.protocol("WM_DELETE_WINDOW", on_closing)
 root.mainloop()
+
+
+# TODO:
+# Add a second screen or something similar ?
+# Correct tag behaviour (new line, etc.)
+# Enable more bindings (undo/redo, next/previous day, select all)
+# Proper resizing of the elements (+min size)
+# Check if window on top works on mac
+# Check all themes on each platform
