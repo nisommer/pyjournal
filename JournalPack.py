@@ -1,5 +1,5 @@
-#!/usr/bin/python3.4
-# #from __future__ import absolute_import
+
+#from __future__ import absolute_import
 #from __future__ import absolute_import, unicode_literals
 #from . import Entry
 from tkinter import *
@@ -175,12 +175,10 @@ def insertTime():
 
 
 
-
 ### MAIN code
 
 root = Tk()
 root.title("Journal test program")
-
 
 initTime=datetime.now()
 
@@ -228,7 +226,7 @@ dateDisplay.pack(side=TOP,fill=BOTH)
 
 topframe.pack(side=TOP,fill=BOTH)
 
-text.pack(side=TOP,fill=BOTH, expand = 1)
+text.pack(side=TOP,fill=BOTH)
 bottomframe.pack(side=BOTTOM)
 words.pack(side=RIGHT)
 lastTimeDisplay.pack(side=LEFT)
@@ -325,3 +323,8 @@ root.mainloop()
 # Proper resizing of the elements (+min size)
 # Check if window on top works on mac
 # Check all themes on each platform
+root.mainloop()
+
+
+#py2applet --make-setup JournalPack.py
+# python3.4 setup.py py2app
