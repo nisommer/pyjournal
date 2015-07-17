@@ -1,24 +1,27 @@
-
-#from __future__ import absolute_import
-#from __future__ import absolute_import, unicode_literals
-#from . import Entry
+# from __future__ import absolute_import
+# from __future__ import absolute_import, unicode_literals
+# from . import Entry
 from tkinter import *
 from tkinter import ttk
 from datetime import datetime
 from datetime import date, timedelta
 from tkinter import messagebox
-import sys
-
-import Entry
-import methods
 import json
-import jsonpickle
 import os
 from os.path import expanduser
 
+import sys
+import atexit
+import methods
+import jsonpickle
 
-#import time
-from collections import Counter # To count each word ...
+
+
+
+
+# import time
+from collections import Counter  # To count each word ...
+
 __author__ = 'nicolassommer'
 
 
@@ -29,67 +32,54 @@ __author__ = 'nicolassommer'
 ## Save text in some way
 
 ## Get a calendar view, and assign each text box to its calendar day. (or simply, when changing calendar
-#save the current day's text, and reload a new day's text.
-#- check if day exists or not -> create new text ...
-#I should probably have a method to check the most recent entry in the Calendar ..
+# save the current day's text, and reload a new day's text.
+# - check if day exists or not -> create new text ...
+# I should probably have a method to check the most recent entry in the Calendar ..
+
+
+def update_time():
+    global last_touch
+    last_touch = datetime.now()
+    origindate = datetime(2000, 1, 1, 00, 00, 0)
+
+    # Time since last touch
+    deltaInit = datetime.now() - initTime
+    # Update time since beginning
+    lastTimeText.set((origindate + deltaInit).strftime("%H:%M:%S"))
+    root.after(1000, update_time)
 
 
 def retrieve_input():
     return text.get("1.0", "end-1c")
 
+
 def on_closing():
     if messagebox.askyesno("Save", "Do you want to save?"):
-        return_touched()
+        SaveEntry()
     root.destroy()
 
-def key_touched(*args):
 
+def CountWords(*args):
     """
     Update when a key is typed
     :param args:
     """
 
-    # Display time since last keystroke
-    global last_touch
-    delta=(datetime.now()-last_touch)
-    #global initTime
-    #print("{}min {}s".format(int(delta.seconds/60),delta.seconds%60))
-    last_touch = datetime.now()
-    origindate=datetime(2000, 1, 1, 00, 00, 0)
-    print((origindate+delta).strftime("%H:%M:%S"))
-
-    # Time since last touch
-    deltaInit=datetime.now()-initTime
-    # Update time since beginning
-    lastTimeText.set((origindate+deltaInit).strftime("%H:%M:%S"))
-
-
     input_str = retrieve_input()
     nwords = len(input_str.split())
     wordCount.set(nwords)
     wordsText.set(str(nwords) + " words")
-    counts = Counter(input_str.lower().split()) # Need a way to transform this list in another way ...
-    #cnames.set(tuple(counts.items())) # Old version, this is quite better.
+    counts = Counter(input_str.lower().split())  # Need a way to transform this list in another way ...
 
     wordList = []
-    wordSet=set()
     for key, value in counts.items():
-        wordSet.add((str(value) + ": " + str(key)))
         wordList.append((str(value) + ": " + str(key)))
 
     wordList.sort(reverse=1)
     cnames.set(tuple(wordList))
 
 
-    # Try to print out the current line ..
-    # print(text.get("insert linestart","insert lineend")=="")
-    # if(text.get("insert linestart","insert lineend").strip()==""):
-    #     print("empty line")
-    # else:
-    #     print("There is something on the line")
-
-def return_touched(*args):
-
+def SaveEntry(*args):
     """
     Update when a return is typed. Goal is to save the data here ...
     :param args:
@@ -105,66 +95,72 @@ def return_touched(*args):
     # myfile.close()
 
     my_entries[str(newentry.date)] = newentry
-    print("my_entries length: " + str(len(my_entries.keys())))
+    print("my_entries length (entries): " + str(len(my_entries.keys())))
 
     # For several entries
     jsondump_entries = jsonpickle.encode(my_entries)
-    myfile_entries = open(journal_file_entries,"w")
+    myfile_entries = open(journal_file_entries, "w")
     myfile_entries.write(jsondump_entries)
     myfile_entries.close()
+
 
 def display_info():
     # Probably there is a better way than to create everything here, it should just appear...
     t = Toplevel(root)
-    t.geometry('300x200+'+str(root.winfo_width()+root.winfo_x()+20)+'+'+str(root.winfo_y())) # Set it next to the initial window
-    root.winfo_geometry()
-    root.wm_geometry()
-
-    input_str = retrieve_input()
+    t.geometry('300x200+' + str(root.winfo_width() + root.winfo_x() + 20) + '+' + str(
+        root.winfo_y()))  # Set it next to the initial window
 
     lbox = Listbox(t, listvariable=cnames, height=5)
-    lbox.pack(fill=BOTH,expand=1)
+    lbox.pack(fill=BOTH, expand=1)
 
 
-def dateset(direction):
-    # Save the shit
-    return_touched()
+def ChangeDay(direction):
+    # Save the text
+    SaveEntry()
 
     global currentdate
-    if direction=="right":
+    if direction == "right":
         currentdate = currentdate + timedelta(days=1)
     elif direction == "left":
         currentdate = currentdate + timedelta(days=-1)
     else:
         currentdate = date.today()
 
-
     dateload(currentdate)
-    key_touched()
 
+    # Do the usual computation
+    CountWords()
 
 
 def dateload(date):
-    text.delete(1.0,END)
+    text.delete(1.0, END)
     if (str(date) in my_entries):
         text.insert(1.0, my_entries[str(date)].body)
     else:
-        text.insert(1.0,"")
+        text.insert(1.0, "")
     # Set new date on top ...
     dateDisplayText.set(currentdate.strftime("%A %d %b %Y"))
 
+    # Change position of the cursor to end of file.
+    text.mark_set(INSERT, END)
+    # Scroll to desired position
+    text.see(INSERT)
+    # Set focus on the text area (ready to write)
+    text.focus_set()
+
 
 def insertTime():
+    stringtemp = "--- TIME: " + datetime.today().strftime("%H:%M") + "---"
 
-    stringtemp = "--- TIME: " + datetime.today().strftime("%H:%M")  +"---"
-
-    if(text.get("insert linestart","insert lineend").strip()==""):
+    if (text.get("insert linestart", "insert lineend").strip() == ""):
         print("empty line")
     else:
         print("There is something on the line")
-        stringtemp+="\n"
+
+    stringtemp += "\n"
 
     text.insert("insert linestart", stringtemp)
+
 
 #     En fait, il faudrait que si la ligne suivante est vide, le curseur passe a la ligne suivante, mais pas forcement
 # ajouter une nouvelle ligne --> Trouver commande pour passer le curseur a la fin de la ligne suivante ...
@@ -180,81 +176,82 @@ def insertTime():
 root = Tk()
 root.title("Journal test program")
 
-initTime=datetime.now()
+initTime = datetime.now()
 
 # Previous version ...
 mainframe = ttk.Frame(root)
-mainframe.pack(fill=BOTH,expand=1)
+mainframe.pack(fill=BOTH, expand=1)
 
 ## Create Main Frame
-text = Text(mainframe,background = "light yellow",wrap="word")
+# text = Text(mainframe,background = "light yellow",wrap="word",yscrollcommand=True)
+text = Text(mainframe, background="light yellow", wrap="word")
+
+# Scroller does not seem to be working ...
+# scroller = Scrollbar(text,orient=VERTICAL,command=text.yview())
+# text.configure(yscrollcommand=scroller.set)
 
 bottomframe = ttk.Frame(root)
 quitButton = Button(bottomframe, text="QUIT", command=on_closing)
 infoButton = Button(bottomframe, text="Info", command=display_info)
 TagButton = Button(bottomframe, text="Tag time", command=insertTime)
 
-
-
-wordCount = IntVar() # Number of words
-wordsText = StringVar() # Contents of the text widget
-words = Label(mainframe,textvariable=wordsText,background="grey")
+wordCount = IntVar()  # Number of words
+wordsText = StringVar()  # Contents of the text widget
+words = Label(mainframe, textvariable=wordsText, background="grey")
 wordsText.set("0 words")
 
 # Top bar
 topframe = ttk.Frame(mainframe)
 dateDisplayText = StringVar()
-dateDisplay = Label(topframe,textvariable=dateDisplayText, background="grey")
-rightbutton = Button(topframe,text=">" ,command=lambda: dateset("right"))
-leftbutton = Button(topframe,text="<", command=lambda: dateset("left"))
-homebutton = Button(topframe,text="HOME", command=lambda: dateset("home"))
+dateDisplay = Label(topframe, textvariable=dateDisplayText, background="grey")
+rightbutton = Button(topframe, text=">", command=lambda: ChangeDay("right"))
+leftbutton = Button(topframe, text="<", command=lambda: ChangeDay("left"))
+homebutton = Button(topframe, text="HOME", command=lambda: ChangeDay("home"))
 
 rightbutton.pack(side=RIGHT)
 homebutton.pack(side=RIGHT)
 leftbutton.pack(side=RIGHT)
 TagButton.pack(side=RIGHT)
 
-progressbar = ttk.Progressbar(mainframe, orient=HORIZONTAL, length=200, mode='determinate', maximum = 750, variable=wordCount)
+progressbar = ttk.Progressbar(mainframe, orient=HORIZONTAL, length=200, mode='determinate', maximum=750,
+                              variable=wordCount)
 
-lastTimeText=StringVar()
-lastTimeDisplay = Label(mainframe,textvariable=lastTimeText,background="grey")
+lastTimeText = StringVar()
+lastTimeDisplay = Label(mainframe, textvariable=lastTimeText, background="grey")
 lastTimeText.set("00:00:00")
 # Actually, it would be much better to update this every second ... now it does not make sense ...
 
 
-dateDisplay.pack(side=TOP,fill=BOTH)
+dateDisplay.pack(side=TOP, fill=BOTH)
 
-topframe.pack(side=TOP,fill=BOTH)
+topframe.pack(side=TOP, fill=BOTH)
 
-text.pack(side=TOP,fill=BOTH)
+text.pack(side=TOP, fill=BOTH)
 bottomframe.pack(side=BOTTOM)
 words.pack(side=RIGHT)
 lastTimeDisplay.pack(side=LEFT)
-progressbar.pack(side=LEFT,expand=1,fill = X)
+progressbar.pack(side=LEFT, expand=1, fill=X)
 
-quitButton.pack(side = LEFT)
-infoButton.pack(side = RIGHT)
+quitButton.pack(side=LEFT)
+infoButton.pack(side=RIGHT)
 
-# Set focus on the text area
-text.focus_set()
+cnames = StringVar()  # Used to display words in the new window
 
-cnames = StringVar() # Used to display words in the new window
-
-# Starting some inits
+# Starting some initializations
 last_touch = datetime.now()
 
 global currentdate
-currentdate= date.today()
+currentdate = date.today()
 
 nowH = datetime.today()
-#.set(nowH.strftime("%A %d %b %Y, %H:%M"))
 dateDisplayText.set(currentdate.strftime("%A %d %b %Y"))
+
 # Get dropbox's location
-if(sys.platform.startswith("linux")):
+if (sys.platform.startswith("linux")):
     dropbox_config_path = expanduser("~") + "/.dropbox/info.json"
-elif(sys.platform.startswith("darwin")):
+elif (sys.platform.startswith("darwin")):
     dropbox_config_path = expanduser("~") + "/.dropbox/info.json"
-elif(sys.platform.startswith("win")):
+elif (sys.platform.startswith("win")):
     dropbox_config_path = os.getenv('APPDATA') + "\Dropbox\info.json"
 else:
     print("Failed to get Dropbox's config file path")
@@ -265,23 +262,13 @@ try:
 except:
     print("failed opening Dropbox's config file")
 
-
 dropbox_config_content = dropbox_config_file.read()
 dropbox_config_json = json.loads(dropbox_config_content)
 dropbox_folder_path = dropbox_config_json["personal"]["path"]
 print("dropbox_path: " + dropbox_folder_path)
-journal_file = dropbox_folder_path+'/.journal.txt'
-journal_file_entries = dropbox_folder_path+'/.entries.txt'
+journal_file = dropbox_folder_path + '/.journal.txt'
+journal_file_entries = dropbox_folder_path + '/.entries.txt'
 
-# # Load 1 entry
-# try:
-#     myfile = open(journal_file)
-#     #myfile = open('data.txt')
-#     jsondump = myfile.read()
-#     #print("read from last time: " +jsondump)
-#     myEntry = jsonpickle.decode(jsondump)
-# except:
-#     print("File not found, not loading anything ...")
 
 # Load all entries
 try:
@@ -291,29 +278,45 @@ try:
     dateload(currentdate)
 
 except:
+    # Seems that it enters here, not sure why ...
     print("entries file not found, Creating a new file ...")
     my_entries = dict()
 
 
 # Change Theme
-s =ttk.Style()
+s = ttk.Style()
 print(s.theme_names())
 print(s.theme_use())
-s.theme_use("clam") # Not sure that works on windows !
+s.theme_use("clam")  # Not sure that works on windows !
+
+# Put the window on top. Some additional content if mac
+root.lift()
+if (sys.platform.startswith("darwin")):
+    os.system(''' /usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
+
 
 # Init the functions
-key_touched()
+CountWords()
 
 # Set bindings
-root.bind('<KeyPress>', key_touched)
-root.bind('<Return>', return_touched)
+root.bind('<KeyPress>', CountWords)
+root.bind('<Return>', SaveEntry)
+# Bind Alt-arrow to change the day
+root.bind('<Mod2-Left>', lambda a: ChangeDay("left"))
+root.bind('<Mod2-Right>', lambda a: ChangeDay("right"))
+root.bind('<Mod2-Up>', lambda a: ChangeDay("home"))
 
-# Window on Top (check if that works on mac ...) it means ALWAYS on top !!!
-#root.attributes('-topmost', True)
+
+# Do a save check on the exit
+# root.protocol("WM_DELETE_WINDOW", on_closing)
+# This version runs on mac too.
+atexit.register(on_closing)
+root.after(1000, update_time)
 
 # Run the program
-root.protocol("WM_DELETE_WINDOW", on_closing)
 root.mainloop()
+
+
 
 
 # TODO:
@@ -321,10 +324,9 @@ root.mainloop()
 # Correct tag behaviour (new line, etc.)
 # Enable more bindings (undo/redo, next/previous day, select all)
 # Proper resizing of the elements (+min size)
-# Check if window on top works on mac
 # Check all themes on each platform
 root.mainloop()
 
 
-#py2applet --make-setup JournalPack.py
+# py2applet --make-setup JournalPack.py
 # python3.4 setup.py py2app
