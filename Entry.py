@@ -2,22 +2,21 @@ from __future__ import unicode_literals
 
 __author__ = 'Nico'
 
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
 
 import re
-import textwrap
-from datetime import datetime,date
 import json
 
+
 class Entry:
-    def __init__(self, date=None,title="", body="", starred=False):
-        #self.journal = journal  # Reference to journal mainly to access it's config
-        #self.date = date or datetime.now()
+    def __init__(self, date=None, title="", body="", starred=False):
+        # self.journal = journal  # Reference to journal mainly to access it's config
+        # self.date = date or datetime.now()
         self.date = date or date.today()
         self.title = title.rstrip("\n ")
         self.body = body.rstrip("\n ")
-        #self.tags = self.parse_tags()
+        # self.tags = self.parse_tags()
         self.starred = starred
         self.modified = False
         # print(" init title: " + title)
@@ -26,12 +25,12 @@ class Entry:
     @staticmethod
     def tag_regex(tagsymbols):
         pattern = r'(?u)\s([{tags}][-+*#/\w]+)'.format(tags=tagsymbols)
-        return re.compile( pattern, re.UNICODE )
+        return re.compile(pattern, re.UNICODE)
 
     def parse_tags(self):
-        fulltext =  " " + " ".join([self.title, self.body]).lower()
+        fulltext = " " + " ".join([self.title, self.body]).lower()
         tagsymbols = self.journal.config['tagsymbols']
-        tags = re.findall( Entry.tag_regex(tagsymbols), fulltext )
+        tags = re.findall(Entry.tag_regex(tagsymbols), fulltext)
         self.tags = tags
         return set(tags)
 
@@ -85,11 +84,11 @@ class Entry:
 
     def __eq__(self, other):
         if not isinstance(other, Entry) \
-           or self.title.strip() != other.title.strip() \
-           or self.body.rstrip() != other.body.rstrip() \
-           or self.date != other.date \
-           or self.starred != other.starred:
-           return False
+                or self.title.strip() != other.title.strip() \
+                or self.body.rstrip() != other.body.rstrip() \
+                or self.date != other.date \
+                or self.starred != other.starred:
+            return False
         return True
 
     def __ne__(self, other):
@@ -124,8 +123,11 @@ class Entry:
     #         sort_keys=True, indent=4)
 
     def _try(o):
-        try: return o.__dict__
-        except: return str(o)
+        try:
+            return o.__dict__
+        except:
+            return str(o)
 
     def to_JSON(self):
-        return json.dumps(self, default=lambda o: self._try(o), sort_keys=True, indent=0, separators=(',',':')).replace('\n', '')
+        return json.dumps(self, default=lambda o: self._try(o), sort_keys=True, indent=0,
+                          separators=(',', ':')).replace('\n', '')
