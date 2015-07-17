@@ -251,7 +251,6 @@ currentdate= date.today()
 nowH = datetime.today()
 #.set(nowH.strftime("%A %d %b %Y, %H:%M"))
 dateDisplayText.set(currentdate.strftime("%A %d %b %Y"))
-
 # Get dropbox's location
 if(sys.platform.startswith("linux")):
     dropbox_config_path = expanduser("~") + "/.dropbox/info.json"
@@ -262,9 +261,9 @@ elif(sys.platform.startswith("win")):
 else:
     print("Failed to get Dropbox's config file path")
 
-
+print("dropbox_config_path: " + dropbox_config_path)
 try:
-    dropbox_config_file = open(expanduser("~") + "/.dropbox/info.json")
+    dropbox_config_file = open(dropbox_config_path)
 except:
     print("failed opening Dropbox's config file")
 
