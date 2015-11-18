@@ -29,7 +29,6 @@ __author__ = 'nicolassommer'
 # Count each word: mostly OK
 
 ## TODO:
-## Save text in some way
 
 ## Get a calendar view, and assign each text box to its calendar day. (or simply, when changing calendar
 # save the current day's text, and reload a new day's text.
@@ -88,11 +87,6 @@ def SaveEntry(*args):
     input_str = retrieve_input()
     newentry = methods.new_entry(input_str, currentdate)
 
-    # jsondump = jsonpickle.encode(newentry)
-    #
-    # myfile = open(journal_file,"w")
-    # myfile.write(jsondump)
-    # myfile.close()
 
     my_entries[str(newentry.date)] = newentry
     print("my_entries length (entries): " + str(len(my_entries.keys())))
@@ -162,16 +156,10 @@ def insertTime():
     text.insert("insert linestart", stringtemp)
 
 
-#     En fait, il faudrait que si la ligne suivante est vide, le curseur passe a la ligne suivante, mais pas forcement
-# ajouter une nouvelle ligne --> Trouver commande pour passer le curseur a la fin de la ligne suivante ...
 
 
 
-
-
-
-
-### MAIN code
+### MAIN init code
 
 root = Tk()
 root.title("Journal test program")
@@ -186,9 +174,6 @@ mainframe.pack(fill=BOTH, expand=1)
 # text = Text(mainframe,background = "light yellow",wrap="word",yscrollcommand=True)
 text = Text(mainframe, background="light yellow", wrap="word")
 
-# Scroller does not seem to be working ...
-# scroller = Scrollbar(text,orient=VERTICAL,command=text.yview())
-# text.configure(yscrollcommand=scroller.set)
 
 bottomframe = ttk.Frame(root)
 quitButton = Button(bottomframe, text="QUIT", command=on_closing)
@@ -226,7 +211,7 @@ dateDisplay.pack(side=TOP, fill=BOTH)
 
 topframe.pack(side=TOP, fill=BOTH)
 
-text.pack(side=TOP, fill=BOTH)
+text.pack(side=TOP, fill=BOTH, expand=1)
 bottomframe.pack(side=BOTTOM)
 words.pack(side=RIGHT)
 lastTimeDisplay.pack(side=LEFT)
