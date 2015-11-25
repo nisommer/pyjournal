@@ -7,10 +7,27 @@ __author__ = 'Nico'
 
 import re
 import json
+from datetime import datetime
+from datetime import date, timedelta
+
+from tkinter import *
+from tkinter import ttk
+from datetime import datetime
+from datetime import date, timedelta
+from tkinter import messagebox
+import json
+import os
+from os.path import expanduser
+
+import sys
+import atexit
+import methods
+import jsonpickle
+
 
 
 class Entry:
-    def __init__(self, date=None, title="", body="", starred=False):
+    def __init__(self, date=date.today(), title="", body="", starred=False):
         # self.journal = journal  # Reference to journal mainly to access it's config
         # self.date = date or datetime.now()
         self.date = date or date.today()

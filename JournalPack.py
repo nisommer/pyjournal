@@ -85,17 +85,17 @@ def SaveEntry(*args):
     """
 
     input_str = retrieve_input()
-    newentry = methods.new_entry(input_str, currentdate)
+    if input_str!="" or True: # Not sure yet how to work this out.
+        newentry = methods.new_entry(input_str, currentdate)
+        my_entries[str(newentry.date)] = newentry
 
+        print("my_entries length (entries): " + str(len(my_entries.keys())))
 
-    my_entries[str(newentry.date)] = newentry
-    print("my_entries length (entries): " + str(len(my_entries.keys())))
-
-    # For several entries
-    jsondump_entries = jsonpickle.encode(my_entries)
-    myfile_entries = open(journal_file_entries, "w")
-    myfile_entries.write(jsondump_entries)
-    myfile_entries.close()
+        # For several entries
+        jsondump_entries = jsonpickle.encode(my_entries)
+        myfile_entries = open(journal_file_entries, "w")
+        myfile_entries.write(jsondump_entries)
+        myfile_entries.close()
 
 
 def display_info():
@@ -111,12 +111,31 @@ def display_info():
 def ChangeDay(direction):
     # Save the text
     SaveEntry()
-
     global currentdate
     if direction == "right":
         currentdate = currentdate + timedelta(days=1)
     elif direction == "left":
         currentdate = currentdate + timedelta(days=-1)
+    # Move 20 days max, or to previous day
+    # Not working yet ...
+    # I'm missing some days ...
+    elif direction == "left2":
+        for days_ in range(1,10):
+            day = currentdate - timedelta(days=days_)
+            print(str(day))
+            if str(day) in my_entries:
+                print(my_entries[str(day)].body)
+            if str(day) in my_entries and my_entries[str(day)].body!="":
+                break
+        currentdate = day
+
+    elif direction == "right2":
+        for days_ in range(1,10):
+            day = currentdate + timedelta(days=days_)
+            if str(day) in my_entries and my_entries[str(day)].body!="":
+                break
+        currentdate = day
+
     else:
         currentdate = date.today()
 
@@ -190,12 +209,16 @@ topframe = ttk.Frame(mainframe)
 dateDisplayText = StringVar()
 dateDisplay = Label(topframe, textvariable=dateDisplayText, background="grey")
 rightbutton = Button(topframe, text=">", command=lambda: ChangeDay("right"))
+rightbutton2 = Button(topframe, text=">>", command=lambda: ChangeDay("right2"))
 leftbutton = Button(topframe, text="<", command=lambda: ChangeDay("left"))
+leftbutton2 = Button(topframe, text="<<", command=lambda: ChangeDay("left2"))
 homebutton = Button(topframe, text="HOME", command=lambda: ChangeDay("home"))
 
+rightbutton2.pack(side=RIGHT)
 rightbutton.pack(side=RIGHT)
 homebutton.pack(side=RIGHT)
 leftbutton.pack(side=RIGHT)
+leftbutton2.pack(side=RIGHT)
 TagButton.pack(side=RIGHT)
 
 progressbar = ttk.Progressbar(mainframe, orient=HORIZONTAL, length=200, mode='determinate', maximum=750,
@@ -298,8 +321,10 @@ root.bind('<Mod2-Up>', lambda a: ChangeDay("home"))
 atexit.register(on_closing)
 root.after(1000, update_time)
 
-# Run the program
-root.mainloop()
+# # Run the program
+# with:
+#     root.mainloop()
+
 
 
 
@@ -311,6 +336,8 @@ root.mainloop()
 # Proper resizing of the elements (+min size)
 # Check all themes on each platform
 root.mainloop()
+
+
 
 
 # py2applet --make-setup JournalPack.py
