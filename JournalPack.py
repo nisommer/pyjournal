@@ -16,9 +16,6 @@ import methods
 import jsonpickle
 
 
-
-
-
 # import time
 from collections import Counter  # To count each word ...
 
@@ -28,9 +25,9 @@ __author__ = 'nicolassommer'
 # Count words: OK
 # Count each word: mostly OK
 
-## TODO:
+# TODO:
 
-## Get a calendar view, and assign each text box to its calendar day. (or simply, when changing calendar
+# Get a calendar view, and assign each text box to its calendar day. (or simply, when changing calendar
 # save the current day's text, and reload a new day's text.
 # - check if day exists or not -> create new text ...
 # I should probably have a method to check the most recent entry in the Calendar ..
@@ -68,14 +65,21 @@ def CountWords(*args):
     nwords = len(input_str.split())
     wordCount.set(nwords)
     wordsText.set(str(nwords) + " words")
-    counts = Counter(input_str.lower().split())  # Need a way to transform this list in another way ...
+    # Need a way to transform this list in another way ...
+    counts = Counter(input_str.lower().split())
 
-    wordList = []
+    # wordList = []
+    wordList2 = []
     for key, value in counts.items():
-        wordList.append((str(value) + ": " + str(key)))
+        # wordList.append((str(value) + ": " + str(key)))
+        wordList2.append([value, str(key)])
 
-    wordList.sort(reverse=1)
-    cnames.set(tuple(wordList))
+    # wordList.sort(reverse=1)
+    wordList2.sort(reverse=1, key=lambda x: x[0])
+    # print(wordList)
+    # print(wordList2)
+    # cnames.set(tuple(wordList))
+    cnames.set(tuple(wordList2))
 
 
 def SaveEntry(*args):
@@ -85,7 +89,7 @@ def SaveEntry(*args):
     """
 
     input_str = retrieve_input()
-    if input_str!="" or True: # Not sure yet how to work this out.
+    if input_str != "" or True:  # Not sure yet how to work this out.
         newentry = methods.new_entry(input_str, currentdate)
         my_entries[str(newentry.date)] = newentry
 
@@ -120,19 +124,19 @@ def ChangeDay(direction):
     # Not working yet ...
     # I'm missing some days ...
     elif direction == "left2":
-        for days_ in range(1,10):
+        for days_ in range(1, 10):
             day = currentdate - timedelta(days=days_)
             print(str(day))
             if str(day) in my_entries:
                 print(my_entries[str(day)].body)
-            if str(day) in my_entries and my_entries[str(day)].body!="":
+            if str(day) in my_entries and my_entries[str(day)].body != "":
                 break
         currentdate = day
 
     elif direction == "right2":
-        for days_ in range(1,10):
+        for days_ in range(1, 10):
             day = currentdate + timedelta(days=days_)
-            if str(day) in my_entries and my_entries[str(day)].body!="":
+            if str(day) in my_entries and my_entries[str(day)].body != "":
                 break
         currentdate = day
 
@@ -175,10 +179,8 @@ def insertTime():
     text.insert("insert linestart", stringtemp)
 
 
+# MAIN init code
 
-
-
-### MAIN init code
 
 root = Tk()
 root.title("Journal test program")
@@ -189,7 +191,7 @@ initTime = datetime.now()
 mainframe = ttk.Frame(root)
 mainframe.pack(fill=BOTH, expand=1)
 
-## Create Main Frame
+# Create Main Frame
 # text = Text(mainframe,background = "light yellow",wrap="word",yscrollcommand=True)
 text = Text(mainframe, background="light yellow", wrap="word")
 
@@ -274,7 +276,7 @@ dropbox_config_content = dropbox_config_file.read()
 dropbox_config_json = json.loads(dropbox_config_content)
 dropbox_folder_path = dropbox_config_json["personal"]["path"]
 print("dropbox_path: " + dropbox_folder_path)
-journal_file = dropbox_folder_path + '/.journal.txt'
+# journal_file = dropbox_folder_path + '/.journal.txt'
 journal_file_entries = dropbox_folder_path + '/.entries.txt'
 
 
@@ -300,7 +302,8 @@ s.theme_use("clam")  # Not sure that works on windows !
 # Put the window on top. Some additional content if mac
 root.lift()
 if (sys.platform.startswith("darwin")):
-    os.system(''' /usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
+    os.system(
+        ''' /usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
 
 # Init the functions
@@ -326,9 +329,6 @@ root.after(1000, update_time)
 #     root.mainloop()
 
 
-
-
-
 # TODO:
 # Add a second screen or something similar ?
 # Correct tag behaviour (new line, etc.)
@@ -336,8 +336,6 @@ root.after(1000, update_time)
 # Proper resizing of the elements (+min size)
 # Check all themes on each platform
 root.mainloop()
-
-
 
 
 # py2applet --make-setup JournalPack.py
