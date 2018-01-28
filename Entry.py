@@ -1,8 +1,8 @@
+# !/usr/bin/env python
 from __future__ import unicode_literals
 
 __author__ = 'Nico'
 
-# !/usr/bin/env python
 # encoding: utf-8
 
 import re
@@ -20,7 +20,7 @@ class Entry:
         self.title = title.rstrip("\n ")
         self.body = body.rstrip("\n ")
         # self.tags = self.parse_tags()
-        self.starred = starred
+        # self.starred = starred
         self.modified = False
         # print(" init title: " + title)
         # print(" init body: " + body)
