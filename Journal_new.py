@@ -52,6 +52,43 @@ class Journal():
     def __init__(self):
         """Initialize windows and variables"""
 
+        self.prepare_windows()
+
+        self.l_word_count = StringVar()  # Used to display words in the new window
+
+        # Starting some initializations
+        self.last_touch = datetime.now()
+        self.currentdate = date.today()
+        self.dateDisplayText.set(self.currentdate.strftime("%A %d %b %Y"))
+
+        # LOAD DATA
+        self.find_dropbox_path()
+        self.load_entries()
+
+        ##  Change Theme
+        # s = ttk.Style()
+        # Print available themes.
+        # print(s.theme_names())
+        # themes = ('aqua', 'clam', 'alt', 'default', 'classic')
+        # s.theme_use("")
+        # s.theme_use(themes[4])  # Not sure that works on windows !
+        # print(s.theme_use())
+
+        # Init the functions
+        self.CountWords()
+
+        # Do a save check on the exit
+        # self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        # This version runs on mac too:
+
+        # Run "update_time" every second
+        atexit.register(self.on_closing)
+        self.root.after(1000, self.update_time)
+
+        # # Run the program
+        self.root.mainloop()
+
+    def prepare_windows(self):
         # Initialize the windows and buttons
         self.root = Tk()
         self.root.title("Journal")
@@ -80,6 +117,7 @@ class Journal():
         self.dateDisplayText = StringVar()
         dateDisplay = Label(
             topframe, textvariable=self.dateDisplayText, background="grey")
+
         rightbutton = Button(topframe, text=">", command=lambda: self.ChangeDay("right"))
         rightbutton2 = Button(topframe, text=">>",
                               command=lambda: self.ChangeDay("right2"))
@@ -97,11 +135,10 @@ class Journal():
         progressbar = ttk.Progressbar(self.mainframe, orient=HORIZONTAL, length=200,
                                       mode='determinate', maximum=750, variable=self.wordCount)
 
-        self.lastTimeText = StringVar()
+        self.time_since_opening = StringVar()
         lastTimeDisplay = Label(
-            self.mainframe, textvariable=self.lastTimeText, background="grey")
-        self.lastTimeText.set("00:00:00")
-        # Actually, it would be much better to update this every second ... now it does not make sense ...
+            self.mainframe, textvariable=self.time_since_opening, background="grey")
+        self.time_since_opening.set("00:00:00")
 
         dateDisplay.pack(side=TOP, fill=BOTH)
 
@@ -116,34 +153,11 @@ class Journal():
         quitButton.pack(side=LEFT)
         infoButton.pack(side=RIGHT)
 
-        self.l_word_count = StringVar()  # Used to display words in the new window
-
-        # Starting some initializations
-        self.last_touch = datetime.now()
-
-        self.currentdate = date.today()
-
-        # nowH = datetime.today()
-        self.dateDisplayText.set(self.currentdate.strftime("%A %d %b %Y"))
-        self.load_entries()
-
-        # Change Theme
-        s = ttk.Style()
-        # Print available themes.
-        print(s.theme_names())
-        themes = ('aqua', 'clam', 'alt', 'default', 'classic')
-        # s.theme_use("")
-        # s.theme_use(themes[4])  # Not sure that works on windows !
-        print(s.theme_use())
-
         # Put the window on top. Some additional content if mac
         self.root.lift()
         if (sys.platform.startswith("darwin")):
             os.system(
                 ''' /usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
-
-        # Init the functions
-        self.CountWords()
 
         # Set bindings:
         # Recount words after each keypress
@@ -155,18 +169,7 @@ class Journal():
         self.root.bind('<Mod2-Right>', lambda a: self.ChangeDay("right"))
         self.root.bind('<Mod2-Up>', lambda a: self.ChangeDay("home"))
 
-        # Do a save check on the exit
-        # self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        # This version runs on mac too:
-
-        # Run "update_time" every second
-        atexit.register(self.on_closing)
-        self.root.after(1000, self.update_time)
-
-        # # Run the program
-        self.root.mainloop()
-
-    def load_entries(self):
+    def find_dropbox_path(self):
 
         # Get dropbox's location
         if (sys.platform.startswith("linux")):
@@ -176,7 +179,9 @@ class Journal():
         elif (sys.platform.startswith("win")):
             dropbox_config_path = os.getenv('APPDATA') + "\Dropbox\info.json"
         else:
-            print("Failed to get Dropbox's config file path")
+            print("Failed to get Dropbox's config file path, using local folder")
+            self.journal_file_entries = 'entries.txt'
+            return None
 
         print("dropbox_config_path: " + dropbox_config_path)
         try:
@@ -192,6 +197,14 @@ class Journal():
         self.journal_file_entries = dropbox_folder_path + '/.entries.txt'
         # self.journal_file_entries = dropbox_folder_path + '/.entries_test.txt'
 
+        print("saving entries to " + self.journal_file_entries)
+
+    # def set_local_path(self):
+    #     """ Set path to current folder """
+    #     print("Saving data to local folder")
+    #     self.journal_file_entries = "/.entries.txt"
+
+    def load_entries(self):
         # Load all entries
         try:
             myfile_entries = open(self.journal_file_entries)
@@ -201,17 +214,19 @@ class Journal():
 
         except:
             # Seems that it enters here, not sure why ...
-            print("entries file not found, Creating a new file ...")
+            print("Entries file not found, creating a new file ...")
             self.my_entries = dict()
 
     def update_time(self):
+        """ Update time since program open
+        """
         self.last_touch = datetime.now()
         origindate = datetime(2000, 1, 1, 00, 00, 0)
 
         # Time since last touch
         deltaInit = datetime.now() - self.initTime
         # Update time since beginning
-        self.lastTimeText.set((origindate + deltaInit).strftime("%H:%M:%S"))
+        self.time_since_opening.set((origindate + deltaInit).strftime("%H:%M:%S"))
         self.root.after(1000, self.update_time)
 
     def retrieve_input(self):
@@ -269,6 +284,9 @@ class Journal():
             myfile_entries.close()
 
     def display_info(self):
+        """ Display statistics over the words used
+
+        """
         # Probably there is a better way than to create everything here, it should just appear...
 
         self.CountWordsAllEntries()
@@ -281,8 +299,10 @@ class Journal():
         lbox.pack(fill=BOTH, expand=1)
 
     def ChangeDay(self, direction):
-        # Save the text
+        """ Go to a new entry
+        """
         max_days_search = 20
+        # Save the text
         self.SaveEntry()
         if direction == "right":
             self.currentdate = self.currentdate + timedelta(days=1)
@@ -312,6 +332,9 @@ class Journal():
         self.dateload(self.currentdate)
 
     def dateload(self, date):
+        """ Load desired date
+
+        """
         self.text.delete(1.0, END)
         if (str(date) in self.my_entries):
             self.text.insert(1.0, self.my_entries[str(date)].body)
