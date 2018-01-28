@@ -1,6 +1,3 @@
-# from __future__ import absolute_import
-# from __future__ import absolute_import, unicode_literals
-# from . import Entry
 from tkinter import *
 from tkinter import ttk
 from datetime import datetime
@@ -10,13 +7,13 @@ import json
 import os
 from os.path import expanduser
 
+
 import sys
 import atexit
 import methods
 import jsonpickle
 
 
-# import time
 from collections import Counter  # To count each word ...
 
 __author__ = 'nicolassommer'
@@ -109,6 +106,16 @@ def display_info():
         root.winfo_y()))  # Set it next to the initial window
 
     lbox = Listbox(t, listvariable=cnames, height=5)
+    lbox.pack(fill=BOTH, expand=1)
+
+
+def display_info_full():
+    # Probably there is a better way than to create everything here, it should just appear...
+    t = Toplevel(root)
+    t.geometry('300x200+' + str(root.winfo_width() + root.winfo_x() + 20) + '+' + str(
+        root.winfo_y()))  # Set it next to the initial window
+
+    lbox = Listbox(t, listvariable=vocab_full, height=5)
     lbox.pack(fill=BOTH, expand=1)
 
 

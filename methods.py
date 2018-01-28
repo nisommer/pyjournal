@@ -22,7 +22,6 @@ def new_entry(raw, date=None, sort=True):
         title = ""
         body = raw
 
-
     starred = False
 
     if not date:  # Still nothing? Meh, just live in the moment.

@@ -7,23 +7,9 @@ __author__ = 'Nico'
 
 import re
 import json
-from datetime import datetime
+
+
 from datetime import date, timedelta
-
-from tkinter import *
-from tkinter import ttk
-from datetime import datetime
-from datetime import date, timedelta
-from tkinter import messagebox
-import json
-import os
-from os.path import expanduser
-
-import sys
-import atexit
-import methods
-import jsonpickle
-
 
 
 class Entry:
