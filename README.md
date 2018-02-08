@@ -22,6 +22,6 @@ chmod 755 journal
 Edit the file `journal` as follows
 ```
 #!/bin/sh
-python /PATH_TO_FOLDER/Journal_new.py
+python /PATH_TO_FOLDER/pyjournal.py
 ```
 

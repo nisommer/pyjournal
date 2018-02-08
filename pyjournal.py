@@ -12,9 +12,9 @@ from os.path import expanduser
 
 import sys
 import atexit
-import methods
 import jsonpickle
 
+import journal_helper
 
 from collections import Counter  # To count each word ...
 
@@ -65,7 +65,7 @@ class Journal():
         self.find_dropbox_path()
         self.load_entries()
 
-        ##  Change Theme
+        # Change Theme
         # s = ttk.Style()
         # Print available themes.
         # print(s.theme_names())
@@ -212,10 +212,20 @@ class Journal():
             self.my_entries = jsonpickle.decode(jsondump_entries)
             self.dateload(self.currentdate)
 
-        except:
-            # Seems that it enters here, not sure why ...
+        # This happens when there is a problem in the decode part.
+        except AttributeError as ex:
+            print("Problem reading the entres file. May be caused by a new version not compatible")
+            exit(0)
+
+        # This happens when no entries file is present
+        except FileNotFoundError as ex:
             print("Entries file not found, creating a new file ...")
             self.my_entries = dict()
+
+        # except Exception as ex:
+        #     template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        #     message = template.format(type(ex).__name__, ex.args)
+        #     print(message)    #     except Exception as e:
 
     def update_time(self):
         """ Update time since program open
@@ -272,7 +282,7 @@ class Journal():
 
         input_str = self.retrieve_input()
         if input_str != "" or True:  # Not sure yet how to work this out.
-            newentry = methods.new_entry(input_str, self.currentdate)
+            newentry = journal_helper.new_entry(input_str, self.currentdate)
             self.my_entries[str(newentry.date)] = newentry
 
             print("self.my_entries length (entries): " + str(len(self.my_entries.keys())))

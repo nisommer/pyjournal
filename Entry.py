@@ -5,11 +5,11 @@ __author__ = 'Nico'
 
 # encoding: utf-8
 
-import re
-import json
+# import re
+# import json
 
 
-from datetime import date, timedelta
+from datetime import date
 
 
 class Entry:
@@ -25,17 +25,17 @@ class Entry:
         # print(" init title: " + title)
         # print(" init body: " + body)
 
-    @staticmethod
-    def tag_regex(tagsymbols):
-        pattern = r'(?u)\s([{tags}][-+*#/\w]+)'.format(tags=tagsymbols)
-        return re.compile(pattern, re.UNICODE)
+    # @staticmethod
+    # def tag_regex(tagsymbols):
+    #     pattern = r'(?u)\s([{tags}][-+*#/\w]+)'.format(tags=tagsymbols)
+    #     return re.compile(pattern, re.UNICODE)
 
-    def parse_tags(self):
-        fulltext = " " + " ".join([self.title, self.body]).lower()
-        tagsymbols = self.journal.config['tagsymbols']
-        tags = re.findall(Entry.tag_regex(tagsymbols), fulltext)
-        self.tags = tags
-        return set(tags)
+    # def parse_tags(self):
+    #     fulltext = " " + " ".join([self.title, self.body]).lower()
+    #     tagsymbols = self.journal.config['tagsymbols']
+    #     tags = re.findall(Entry.tag_regex(tagsymbols), fulltext)
+    #     self.tags = tags
+    #     return set(tags)
 
     # def __unicode__(self):
     #     """Returns a string representation of the entry to be written into a journal file."""
@@ -82,55 +82,55 @@ class Entry:
     #             body=body if has_body else "",
     #         )
 
-    def __repr__(self):
-        return "<Entry '{0}' on {1}>".format(self.title.strip(), self.date.strftime("%Y-%m-%d %H:%M"))
+    # def __repr__(self):
+    #     return "<Entry '{0}' on {1}>".format(self.title.strip(), self.date.strftime("%Y-%m-%d %H:%M"))
 
-    def __eq__(self, other):
-        if not isinstance(other, Entry) \
-                or self.title.strip() != other.title.strip() \
-                or self.body.rstrip() != other.body.rstrip() \
-                or self.date != other.date \
-                or self.starred != other.starred:
-            return False
-        return True
+    # def __eq__(self, other):
+    #     if not isinstance(other, Entry) \
+    #             or self.title.strip() != other.title.strip() \
+    #             or self.body.rstrip() != other.body.rstrip() \
+    #             or self.date != other.date \
+    #             or self.starred != other.starred:
+    #         return False
+    #     return True
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    # def __ne__(self, other):
+    #     return not self.__eq__(other)
 
-    def to_dict(self):
-        return {
-            'title': self.title,
-            'body': self.body,
-            'date': self.date.strftime("%Y-%m-%d"),
-            'time': self.date.strftime("%H:%M"),
-            'starred': self.starred
-        }
+    # def to_dict(self):
+    #     return {
+    #         'title': self.title,
+    #         'body': self.body,
+    #         'date': self.date.strftime("%Y-%m-%d"),
+    #         'time': self.date.strftime("%H:%M"),
+    #         'starred': self.starred
+    #     }
 
-    def to_md(self):
-        date_str = self.date.strftime(self.journal.config['timeformat'])
-        body_wrapper = "\n\n" if self.body else ""
-        body = body_wrapper + self.body
-        space = "\n"
-        md_head = "###"
+    # def to_md(self):
+    #     date_str = self.date.strftime(self.journal.config['timeformat'])
+    #     body_wrapper = "\n\n" if self.body else ""
+    #     body = body_wrapper + self.body
+    #     space = "\n"
+    #     md_head = "###"
 
-        return "{md} {date}, {title} {body} {space}".format(
-            md=md_head,
-            date=date_str,
-            title=self.title,
-            body=body,
-            space=space
-        )
+    #     return "{md} {date}, {title} {body} {space}".format(
+    #         md=md_head,
+    #         date=date_str,
+    #         title=self.title,
+    #         body=body,
+    #         space=space
+    #     )
+
+    # # def to_JSON(self):
+    # #     return json.dumps(self, default=lambda o: o.__dict__,
+    # #         sort_keys=True, indent=4)
+
+    # def _try(o):
+    #     try:
+    #         return o.__dict__
+    #     except:
+    #         return str(o)
 
     # def to_JSON(self):
-    #     return json.dumps(self, default=lambda o: o.__dict__,
-    #         sort_keys=True, indent=4)
-
-    def _try(o):
-        try:
-            return o.__dict__
-        except:
-            return str(o)
-
-    def to_JSON(self):
-        return json.dumps(self, default=lambda o: self._try(o), sort_keys=True, indent=0,
-                          separators=(',', ':')).replace('\n', '')
+    #     return json.dumps(self, default=lambda o: self._try(o), sort_keys=True, indent=0,
+    #                       separators=(',', ':')).replace('\n', '')
