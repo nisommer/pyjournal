@@ -14,7 +14,6 @@ import sys
 import atexit
 import jsonpickle
 
-import journal_helper
 
 from collections import Counter  # To count each word ...
 
@@ -194,7 +193,8 @@ class Journal():
         dropbox_folder_path = dropbox_config_json["personal"]["path"]
         print("dropbox_path: " + dropbox_folder_path)
         # journal_file = dropbox_folder_path + '/.journal.txt'
-        self.journal_file_entries = dropbox_folder_path + '/.entries.txt'
+        # self.journal_file_entries = dropbox_folder_path + '/.entries.txt'
+        self.journal_file_entries = dropbox_folder_path + '/.entries_s.txt'
         # self.journal_file_entries = dropbox_folder_path + '/.entries_test.txt'
 
         print("saving entries to " + self.journal_file_entries)
@@ -265,7 +265,9 @@ class Journal():
 
         # Should not be necessary to go all over them. Just do it once ...
         for _, entry in self.my_entries.items():
-            counts.update(entry.body.lower().split())
+            #NEW
+            # counts.update(entry.body.lower().split())
+            counts.update(entry.lower().split())
 
         wordList = []
         for key, value in counts.items():
@@ -282,8 +284,9 @@ class Journal():
 
         input_str = self.retrieve_input()
         if input_str != "" or True:  # Not sure yet how to work this out.
-            newentry = journal_helper.new_entry(input_str, self.currentdate)
-            self.my_entries[str(newentry.date)] = newentry
+            # newentry = journal_helper.new_entry(input_str, self.currentdate)
+            #NEW
+            self.my_entries[str(self.currentdate)] = input_str
 
             print("self.my_entries length (entries): " + str(len(self.my_entries.keys())))
 
@@ -324,15 +327,20 @@ class Journal():
                 day = self.currentdate - timedelta(days=days_)
                 print(str(day))
                 if str(day) in self.my_entries:
-                    print(self.my_entries[str(day)].body)
-                if str(day) in self.my_entries and self.my_entries[str(day)].body != "":
+                    #NEW
+                    # print(self.my_entries[str(day)].body)
+                    print(self.my_entries[str(day)])
+                    #NEW
+                # if str(day) in self.my_entries and self.my_entries[str(day)].body != "":
+                if str(day) in self.my_entries and self.my_entries[str(day)] != "":
                     break
             self.currentdate = day
 
         elif direction == "right2":
             for days_ in range(1, max_days_search):
                 day = self.currentdate + timedelta(days=days_)
-                if str(day) in self.my_entries and self.my_entries[str(day)].body != "":
+                # if str(day) in self.my_entries and self.my_entries[str(day)].body != "":
+                if str(day) in self.my_entries and self.my_entries[str(day)] != "":
                     break
             self.currentdate = day
 
@@ -347,7 +355,9 @@ class Journal():
         """
         self.text.delete(1.0, END)
         if (str(date) in self.my_entries):
-            self.text.insert(1.0, self.my_entries[str(date)].body)
+            #NEW
+            # self.text.insert(1.0, self.my_entries[str(date)].body)
+            self.text.insert(1.0, self.my_entries[str(date)])
         else:
             self.text.insert(1.0, "")
         # Set new date on top ...
