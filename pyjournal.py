@@ -26,8 +26,6 @@ __author__ = 'nicolassommer'
 # TODO:
 
 # -- Primary
-# Some functions take *args as second argument, and I don't remember why.
-
 # Filter the "info" function to remove some useless words (stopwords).
 # I could use a library made for that, but that's a bit too much
 
@@ -178,15 +176,15 @@ class Journal():
         elif (sys.platform.startswith("win")):
             dropbox_config_path = os.getenv('APPDATA') + "\Dropbox\info.json"
         else:
-            print("Failed to get Dropbox's config file path, using local folder")
+            print("Failed to get Dropbox's config file path, using local folder. Maybe Dropbox is not installed.")
             self.journal_file_entries = 'entries.txt'
             return None
 
         print("dropbox_config_path: " + dropbox_config_path)
         try:
             dropbox_config_file = open(dropbox_config_path)
-        except:
-            print("failed opening Dropbox's config file")
+        except FileNotFoundError as ex:
+            print("Failed opening Dropbox's config file.")
 
         dropbox_config_content = dropbox_config_file.read()
         dropbox_config_json = json.loads(dropbox_config_content)
@@ -199,11 +197,6 @@ class Journal():
 
         print("saving entries to " + self.journal_file_entries)
 
-    # def set_local_path(self):
-    #     """ Set path to current folder """
-    #     print("Saving data to local folder")
-    #     self.journal_file_entries = "/.entries.txt"
-
     def load_entries(self):
         # Load all entries
         try:
@@ -214,7 +207,7 @@ class Journal():
 
         # This happens when there is a problem in the decode part.
         except AttributeError as ex:
-            print("Problem reading the entres file. May be caused by a new version not compatible")
+            print("Problem reading the entries file. May be caused by a new version not compatible")
             exit(0)
 
         # This happens when no entries file is present
@@ -222,13 +215,8 @@ class Journal():
             print("Entries file not found, creating a new file ...")
             self.my_entries = dict()
 
-        # except Exception as ex:
-        #     template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        #     message = template.format(type(ex).__name__, ex.args)
-        #     print(message)    #     except Exception as e:
-
     def update_time(self):
-        """ Update time since program open
+        """ Update time since program is open
         """
         self.last_touch = datetime.now()
         origindate = datetime(2000, 1, 1, 00, 00, 0)
@@ -247,10 +235,11 @@ class Journal():
             self.SaveEntry()
         self.root.destroy()
 
-    def CountWords(self, *args):
+    def CountWords(self, event="Manual"):
         """
         Update when a key is typed
         """
+        print("event: \t" + str(event))
 
         input_str = self.retrieve_input()
         nwords = len(input_str.split())
@@ -265,8 +254,6 @@ class Journal():
 
         # Should not be necessary to go all over them. Just do it once ...
         for _, entry in self.my_entries.items():
-            #NEW
-            # counts.update(entry.body.lower().split())
             counts.update(entry.lower().split())
 
         wordList = []
@@ -276,16 +263,14 @@ class Journal():
         wordList.sort(reverse=1, key=lambda x: x[0])
         self.l_word_count.set(tuple(wordList))
 
-    def SaveEntry(self, *args):
+    def SaveEntry(self, event="Manual"):
         """
         Update when a return is typed. Goal is to save the data here ...
-        :param args:
         """
+        print("event: \t" + str(event))
 
         input_str = self.retrieve_input()
         if input_str != "" or True:  # Not sure yet how to work this out.
-            # newentry = journal_helper.new_entry(input_str, self.currentdate)
-            #NEW
             self.my_entries[str(self.currentdate)] = input_str
 
             print("self.my_entries length (entries): " + str(len(self.my_entries.keys())))
@@ -327,11 +312,7 @@ class Journal():
                 day = self.currentdate - timedelta(days=days_)
                 print(str(day))
                 if str(day) in self.my_entries:
-                    #NEW
-                    # print(self.my_entries[str(day)].body)
                     print(self.my_entries[str(day)])
-                    #NEW
-                # if str(day) in self.my_entries and self.my_entries[str(day)].body != "":
                 if str(day) in self.my_entries and self.my_entries[str(day)] != "":
                     break
             self.currentdate = day
@@ -339,7 +320,6 @@ class Journal():
         elif direction == "right2":
             for days_ in range(1, max_days_search):
                 day = self.currentdate + timedelta(days=days_)
-                # if str(day) in self.my_entries and self.my_entries[str(day)].body != "":
                 if str(day) in self.my_entries and self.my_entries[str(day)] != "":
                     break
             self.currentdate = day
@@ -355,8 +335,6 @@ class Journal():
         """
         self.text.delete(1.0, END)
         if (str(date) in self.my_entries):
-            #NEW
-            # self.text.insert(1.0, self.my_entries[str(date)].body)
             self.text.insert(1.0, self.my_entries[str(date)])
         else:
             self.text.insert(1.0, "")
@@ -365,8 +343,8 @@ class Journal():
 
         # Change position of the cursor to end of file.
         self.text.mark_set(INSERT, END)
-        # Scroll to desired position
-        self.text.see(INSERT)
+        # Scroll to desired position (end)
+        self.text.see(END)
         # Set focus on the self.text area (ready to write)
         self.text.focus_set()
 
@@ -380,13 +358,15 @@ class Journal():
         """
         stringtemp = "--- TIME: " + datetime.today().strftime("%H:%M") + "---"
 
-        if (self.text.get("insert linestart", "insert lineend").strip() == ""):
-            print("empty line")
-        else:
-            print("There is something on the line")
+        # Next piece of code is deprecated (was never useful):
+        # if (self.text.get("insert linestart", "insert lineend").strip() == ""):
+        #     print("empty line")
+        # else:
+        #     print("There is something on the line")
 
         stringtemp += "\n"
 
+        # Insert at the begining of the line where the cursor is at
         self.text.insert("insert linestart", stringtemp)
 
 

@@ -11,10 +11,15 @@ myfile_entries = open(journal_file_entries)
 jsondump_entries = myfile_entries.read()
 my_entries = jsonpickle.decode(jsondump_entries)
 
+
+# --- Do the magic here ---
 print(my_entries)
+# Directly save the body of the entry, no other information
 my_entries_string = {key: value.body for key, value in my_entries.items()}
 
+
 print(my_entries_string)
+# ---
 
 
 jsondump_entries_s = jsonpickle.encode(my_entries_string)
