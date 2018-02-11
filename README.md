@@ -19,15 +19,16 @@ nano journal
 chmod 755 journal
 ```
 
-Edit the file `journal` as follows
+Edit the file `journal` as follows:
 ```
 #!/bin/sh
 python /PATH_TO_FOLDER/pyjournal.py
 ```
 
 # Shortcuts
-- Next/Prev/Current Day: [Alt]+Right/Left/Up
+- Go to Next/Prev/Current Day  -->  Alt + Right/Left/Up
 
-# Entries save
+# How is the data saved ?
 If Dropbox is installed, entries are automatically saved as a hidden file ".entries_s.txt" at the root of the Dropbox folder. This allows seemless sync between computers.
 Otherwise, entries are saved in the same folder as the code (not hidden).
+Entries are saved with jsonpickle as simple dictionnaries ({date: text}). This makes them easy to read without this software.
