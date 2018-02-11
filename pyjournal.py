@@ -177,7 +177,7 @@ class Journal():
             dropbox_config_path = os.getenv('APPDATA') + "\Dropbox\info.json"
         else:
             print("Failed to get Dropbox's config file path, using local folder. Maybe Dropbox is not installed.")
-            self.journal_file_entries = 'entries.txt'
+            self.journal_file_entries = 'entries_s.txt'
             return None
 
         print("dropbox_config_path: " + dropbox_config_path)

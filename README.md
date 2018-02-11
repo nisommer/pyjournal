@@ -25,3 +25,9 @@ Edit the file `journal` as follows
 python /PATH_TO_FOLDER/pyjournal.py
 ```
 
+# Shortcuts
+- Next/Prev/Current Day: [Alt]+Right/Left/Up
+
+# Entries save
+If Dropbox is installed, entries are automatically saved as a hidden file ".entries_s.txt" at the root of the Dropbox folder. This allows seemless sync between computers.
+Otherwise, entries are saved in the same folder as the code (not hidden).
